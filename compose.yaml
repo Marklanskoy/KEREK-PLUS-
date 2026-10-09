@@ -1,0 +1,17 @@
+services:
+  kerek:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      KEREK_MODE: demo
+      KEREK_DB: /data/kerek.sqlite3
+      KEREK_ALLOWED_HOSTS: localhost,127.0.0.1
+      KEREK_SECURE_COOKIES: "0"
+    volumes:
+      - kerek-data:/data
+      - kerek-uploads:/app/public/assets/uploads
+    restart: unless-stopped
+volumes:
+  kerek-data:
+  kerek-uploads:

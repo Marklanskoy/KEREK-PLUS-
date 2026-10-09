@@ -1,0 +1,202 @@
+TAP version 13
+# Subtest: retains original SKU IDs and seed is marked demonstration
+ok 1 - retains original SKU IDs and seed is marked demonstration
+  ---
+  duration_ms: 0.944731
+  type: 'test'
+  ...
+# Subtest: search finds Russian and Kazakh product names
+ok 2 - search finds Russian and Kazakh product names
+  ---
+  duration_ms: 1.480861
+  type: 'test'
+  ...
+# Subtest: fuzzy search corrects one typo and returns no random results
+ok 3 - fuzzy search corrects one typo and returns no random results
+  ---
+  duration_ms: 5.48532
+  type: 'test'
+  ...
+# Subtest: search matches multiple words and brand
+ok 4 - search matches multiple words and brand
+  ---
+  duration_ms: 0.263398
+  type: 'test'
+  ...
+# Subtest: normalization handles case punctuation and ё
+ok 5 - normalization handles case punctuation and ё
+  ---
+  duration_ms: 0.157522
+  type: 'test'
+  ...
+# Subtest: bad persisted carts do not crash or accept negative quantities
+ok 6 - bad persisted carts do not crash or accept negative quantities
+  ---
+  duration_ms: 0.881288
+  type: 'test'
+  ...
+# Subtest: cart quantity is limited to current stock
+ok 7 - cart quantity is limited to current stock
+  ---
+  duration_ms: 0.302866
+  type: 'test'
+  ...
+# Subtest: empty cart never pays delivery
+ok 8 - empty cart never pays delivery
+  ---
+  duration_ms: 0.268606
+  type: 'test'
+  ...
+# Subtest: all package prices plus delivery are included
+ok 9 - all package prices plus delivery are included
+  ---
+  duration_ms: 0.387311
+  type: 'test'
+  ...
+# Subtest: unknown product and out of stock are explicit errors
+ok 10 - unknown product and out of stock are explicit errors
+  ---
+  duration_ms: 0.387931
+  type: 'test'
+  ...
+# Subtest: coupon cap and free delivery
+ok 11 - coupon cap and free delivery
+  ---
+  duration_ms: 0.606804
+  type: 'test'
+  ...
+# Subtest: invalid and expired coupons do not discount
+ok 12 - invalid and expired coupons do not discount
+  ---
+  duration_ms: 0.326611
+  type: 'test'
+  ...
+# Subtest: redemption is constrained by balance and order percentage
+ok 13 - redemption is constrained by balance and order percentage
+  ---
+  duration_ms: 0.117513
+  type: 'test'
+  ...
+# Subtest: unknown zone is blocked
+ok 14 - unknown zone is blocked
+  ---
+  duration_ms: 0.085336
+  type: 'test'
+  ...
+# Subtest: aggregate merges repeated ingredients and rounds to whole packs
+ok 15 - aggregate merges repeated ingredients and rounds to whole packs
+  ---
+  duration_ms: 0.296567
+  type: 'test'
+  ...
+# Subtest: more people increase actual ingredient requirements
+ok 16 - more people increase actual ingredient requirements
+  ---
+  duration_ms: 0.361482
+  type: 'test'
+  ...
+# Subtest: confirmed unexpired pantry offsets requirements
+ok 17 - confirmed unexpired pantry offsets requirements
+  ---
+  duration_ms: 0.131694
+  type: 'test'
+  ...
+# Subtest: expired unconfirmed or wrong unit pantry is excluded
+ok 18 - expired unconfirmed or wrong unit pantry is excluded
+  ---
+  duration_ms: 0.142049
+  type: 'test'
+  ...
+# Subtest: stock failure yields missing ingredient rather than imaginary product
+ok 19 - stock failure yields missing ingredient rather than imaginary product
+  ---
+  duration_ms: 0.118385
+  type: 'test'
+  ...
+# Subtest: cheapest choice considers full packages not just unit price
+ok 20 - cheapest choice considers full packages not just unit price
+  ---
+  duration_ms: 0.111935
+  type: 'test'
+  ...
+# Subtest: rule parser reads Russian family budget and number words
+ok 21 - rule parser reads Russian family budget and number words
+  ---
+  duration_ms: 14.065447
+  type: 'test'
+  ...
+# Subtest: rule parser reads Kazakh budget and people
+ok 22 - rule parser reads Kazakh budget and people
+  ---
+  duration_ms: 4.497444
+  type: 'test'
+  ...
+# Subtest: days in request must not accidentally become people
+ok 23 - days in request must not accidentally become people
+  ---
+  duration_ms: 0.388302
+  type: 'test'
+  ...
+# Subtest: plov resets to one meal and sufficient cooking time
+ok 24 - plov resets to one meal and sufficient cooking time
+  ---
+  duration_ms: 0.160126
+  type: 'test'
+  ...
+# Subtest: a new non-plov request does not retain previous recipe restriction
+ok 25 - a new non-plov request does not retain previous recipe restriction
+  ---
+  duration_ms: 0.23728
+  type: 'test'
+  ...
+# Subtest: valid plan stays under full budget and honours portions
+ok 26 - valid plan stays under full budget and honours portions
+  ---
+  duration_ms: 8.447702
+  type: 'test'
+  ...
+# Subtest: vegetarian plans omit meat ingredients
+ok 27 - vegetarian plans omit meat ingredients
+  ---
+  duration_ms: 1.301807
+  type: 'test'
+  ...
+# Subtest: excluded dairy is never selected
+ok 28 - excluded dairy is never selected
+  ---
+  duration_ms: 0.29897
+  type: 'test'
+  ...
+# Subtest: infeasible budget does not invent a complete plan
+ok 29 - infeasible budget does not invent a complete plan
+  ---
+  duration_ms: 0.221717
+  type: 'test'
+  ...
+# Subtest: invalid planner inputs rejected
+ok 30 - invalid planner inputs rejected
+  ---
+  duration_ms: 0.114038
+  type: 'test'
+  ...
+# Subtest: cheaper alternatives retain required physical quantity
+ok 31 - cheaper alternatives retain required physical quantity
+  ---
+  duration_ms: 0.223799
+  type: 'test'
+  ...
+# Subtest: cheaper alternatives do not silently reduce quantity when stock insufficient
+ok 32 - cheaper alternatives do not silently reduce quantity when stock insufficient
+  ---
+  duration_ms: 0.094279
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 105.170848
