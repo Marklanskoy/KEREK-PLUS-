@@ -10,7 +10,7 @@ window.KEREK_BOOT_DONE=false;
  function stage(key){if(state==='failed'||state==='closed')return;const t=document.getElementById('splash-status');if(t&&phrases[key])t.textContent=phrases[key][document.documentElement.lang==='kk'?1:0];}
  function cleanup(){clearTimeout(watchdog);clearTimeout(waiter);clearTimeout(cleanupTimer);const box=app();if(box)box.removeAttribute('aria-busy');document.body.classList.remove('kerek-starting');}
  function fail(){if(state==='closed'||state==='failed')return;state='failed';cleanup();root()?.remove();}
- function completeExit(){const el=root();el?.remove();cleanup();state='closed';}
+ function completeExit(){const el=root();el?.remove();cleanup();state='closed';window.KerekMotion?.firstReveal?.();}
  function exit(){if(state!=='ready')return;const el=root();if(!el){completeExit();return;}
   el.setAttribute('aria-hidden','true');el.style.pointerEvents='none';document.body.classList.remove('kerek-starting');
   if(reduce()){completeExit();return;}
