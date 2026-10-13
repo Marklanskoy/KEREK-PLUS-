@@ -28,11 +28,32 @@ function quote(cart,products,settings,{promo='',bonus=0,balance=0,zone='almaty'}
  const total=Math.max(0,subtotal-discount-usedBonus)+delivery;
  return {lines,errors,subtotal,discount,bonus:usedBonus,maxBonus,delivery,total,savings:savings+discount+usedBonus,promoError,bonusEarned:Math.floor(Math.max(0,subtotal-discount-usedBonus)*settings.bonusRate/100),freeRemaining:Math.max(0,settings.freeDeliveryFrom-subtotal)};
 }
+
+// One shared rule for recipes and Autopilot. Unknown dates are not fresh confirmation.
+function localDate(now=new Date()){return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');}
+function validDate(s){if(typeof s!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;const d=new Date(s+'T12:00:00');return Number.isFinite(+d)&&localDate(d)===s;}
+function pantryStatus(x,today=localDate()){
+ if(!x||!Number.isFinite(Number(x.amount))||Number(x.amount)<=0||!['g','ml','pc'].includes(x.unit))return 'invalid';
+ if(x.expiresAt&&(!validDate(x.expiresAt)||x.expiresAt<today))return 'expired';
+ if(x.confirmed!==true||!validDate(x.checkedAt)||x.checkedAt>today)return 'unconfirmed';
+ const age=(new Date(today+'T12:00:00')-new Date(x.checkedAt+'T12:00:00'))/86400000;
+ return age>14?'stale':'available';
+}
+function usablePantry(xs,today=localDate()){return (Array.isArray(xs)?xs:[]).filter(x=>pantryStatus(x,today)==='available');}
+function substitute(cart,products,fromId,toId){
+ const from=products.find(p=>p.id===fromId),to=products.find(p=>p.id===toId),qty=Number(cart[fromId]);
+ if(!from||!to||!to.active||fromId===toId||!int(qty,1,99)||from.ingredient!==to.ingredient||from.unit!==to.unit||!(from.pack>0&&to.pack>0))return null;
+ const added=Math.ceil(from.pack*qty/to.pack),merged=Number(cart[toId]||0)+added;
+ if(!int(merged,1,99)||merged>to.stock)return null;
+ const next={...cart};delete next[fromId];next[toId]=merged;
+ return {cart:next,qty:added};
+}
+
 function aggregate(recipeIds,people,recipes,products,pantry=[],overrides={}){
  const requirements={},byIngredient={};const missing=[];
  for(const rid of recipeIds){const r=recipes.find(r=>r.id===rid);if(!r){missing.push(rid);continue;}for(const i of r.ingredients){requirements[i.key]=(requirements[i.key]||0)+i.amount*people;byIngredient[i.key]=i.unit;}}
- const atHome={},today=new Date().toISOString().slice(0,10);
- for(const h of pantry){if(h.confirmed===false||h.expiresAt&&h.expiresAt<today||Number(h.amount)<=0||h.unit!==byIngredient[h.ingredient])continue;atHome[h.ingredient]=(atHome[h.ingredient]||0)+Number(h.amount);}
+ const atHome={};
+ for(const h of usablePantry(pantry)){if(h.unit!==byIngredient[h.ingredient])continue;atHome[h.ingredient]=(atHome[h.ingredient]||0)+Number(h.amount);}
  const cart={},details=[];
  for(const [key,required] of Object.entries(requirements)){
   const fromHome=Math.min(required,atHome[key]||0),needed=Math.max(0,Math.round((required-fromHome)*100)/100);
@@ -74,6 +95,23 @@ function makePlan(options,products,recipes,settings,pantry=[]){
  const a=aggregate(ids,o.people,recipes,products,pantry);const q=quote(a.cart,products,settings);
  return {...a,quote:q,selected:ids,options:o,complete:ids.length===o.days,error:ids.length?'':'budget_too_low',partial:ids.length>0&&ids.length<o.days};
 }
-function cheaper(cart,products){const out=[];for(const [id,qty] of Object.entries(cart)){const p=products.find(x=>x.id===id);if(!p)continue;const needed=p.pack*qty;const choices=products.filter(x=>x.active&&x.id!==id&&x.ingredient===p.ingredient&&x.unit===p.unit).map(x=>({product:x,qty:Math.ceil(needed/x.pack)})).filter(x=>x.qty<=x.product.stock&&x.product.price*x.qty<p.price*qty).sort((a,b)=>a.product.price*a.qty-b.product.price*b.qty);if(choices.length)out.push({from:id,to:choices[0].product.id,qty:choices[0].qty,saving:p.price*qty-choices[0].product.price*choices[0].qty});}return out;}
-return {norm,int,clone,cleanCart,distance,search,quote,aggregate,parseRequest,parseExclusions,makePlan,cheaper};
+function cheaper(cart,products,settings,options={}){
+ // No fallback to a product-only comparison: a delivery rule is required.
+ if(!settings)return [];
+ const before=quote(cart,products,settings,options);if(before.errors.length||before.promoError)return [];
+ const out=[];
+ for(const [id,qty] of Object.entries(cart)){
+  const from=products.find(x=>x.id===id);if(!from)continue;
+  const choices=[];
+  for(const to of products){
+   const replacement=substitute(cart,products,id,to.id);if(!replacement)continue;
+   const after=quote(replacement.cart,products,settings,options);
+   if(after.errors.length||after.promoError||after.subtotal<Number(settings.minOrder||0)||after.total>=before.total)continue;
+   choices.push({from:id,to:to.id,qty:replacement.qty,cart:replacement.cart,saving:before.total-after.total,productSaving:before.subtotal-after.subtotal,before,after});
+  }
+  choices.sort((a,b)=>b.saving-a.saving||a.to.localeCompare(b.to));if(choices.length)out.push(choices[0]);
+ }
+ return out;
+}
+return {localDate,validDate,pantryStatus,usablePantry,substitute,norm,int,clone,cleanCart,distance,search,quote,aggregate,parseRequest,parseExclusions,makePlan,cheaper};
 });
