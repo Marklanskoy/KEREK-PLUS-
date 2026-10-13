@@ -1,12 +1,12 @@
-/* KEREK Autopilot 2.0: explicit regular quantities; draft quote covers the WHOLE basket. */
+/* KEREK Autopilot 2.2: explicit regular quantities; draft quote covers the WHOLE basket. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./core.js'));else root.KerekAutopilotCore=factory(root.KerekCore);})(typeof globalThis!=='undefined'?globalThis:this,function(C){
 'use strict';
 const LIMIT=10000000;
 const defaults=()=>({schema:2,monthly:100000,weekly:20000,regular:[],expenses:[]});
 function validate(x){
  if(!x||x.schema!==2||!Number.isSafeInteger(x.monthly)||!Number.isSafeInteger(x.weekly)||!C.int(x.monthly,1,LIMIT)||!C.int(x.weekly,1,LIMIT)||!Array.isArray(x.regular)||!Array.isArray(x.expenses)||x.regular.length>150||x.expenses.length>5000)throw new Error('invalid_autopilot');
- const ids=new Set();for(const r of x.regular){if(typeof r.id!=='string'||r.id.length>100||ids.has(r.id)||!Number.isSafeInteger(r.qty)||!C.int(r.qty,1,99))throw new Error('invalid_regular');ids.add(r.id);}
- ids.clear();for(const r of x.expenses){if(!r||typeof r.id!=='string'||r.id.length>100||ids.has(r.id)||!Number.isSafeInteger(r.amount)||!C.int(r.amount,1,LIMIT)||!C.validDate(r.date)||typeof r.note!=='string'||r.note.length>160)throw new Error('invalid_expense');ids.add(r.id);}
+ const ids=new Set();for(const r of x.regular){if(typeof r.id!=='string'||!r.id||r.id.length>100||['__proto__','constructor','prototype'].includes(r.id)||ids.has(r.id)||!Number.isSafeInteger(r.qty)||!C.int(r.qty,1,99))throw new Error('invalid_regular');ids.add(r.id);}
+ ids.clear();for(const r of x.expenses){if(!r||typeof r.id!=='string'||!r.id||r.id.length>100||['__proto__','constructor','prototype'].includes(r.id)||ids.has(r.id)||!Number.isSafeInteger(r.amount)||!C.int(r.amount,1,LIMIT)||(!C.validDate(r.date)||r.date>C.localDate())||typeof r.note!=='string'||r.note.length>160)throw new Error('invalid_expense');ids.add(r.id);}
  return x;
 }
 function migrate(settings={},manual=[]){
@@ -33,6 +33,8 @@ function candidates(products,orders=[],favorites=[]){const latest=new Map();cons
  return products.filter(p=>p.active&&p.stock>0).map(p=>({p,qty:latest.get(p.id)||1,reason:latest.has(p.id)?'history':favorites.includes(p.id)?'favorite':'catalog'})).sort((a,b)=>({history:0,favorite:1,catalog:2}[a.reason]-{history:0,favorite:1,catalog:2}[b.reason])||Number(b.p.popularity||0)-Number(a.p.popularity||0));
 }
 function propose({cart={},regular=[],pantry=[],products=[],settings,options={},mode='merge',budget}){
+ if(!Number.isSafeInteger(budget)||budget<0||budget>LIMIT)throw new Error('invalid_budget');
+ if(!['merge','replace'].includes(mode)||!Array.isArray(regular)||regular.length>150||new Set(regular.map(x=>x?.id)).size!==regular.length)throw new Error('invalid_regular');
  const base=mode==='replace'?{}:{...cart},next={...base},home=new Map(),notes=[],items=[],missing=[];
  for(const x of C.usablePantry(pantry)){const k=x.ingredient+'|'+x.unit;home.set(k,(home.get(k)||0)+Number(x.amount));}
  for(const line of regular){const p=products.find(p=>p.id===line.id);if(!p||!p.active){missing.push({id:line.id,reason:'unavailable'});continue;}

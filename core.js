@@ -6,26 +6,46 @@ const int=(v,min,max)=>Number.isInteger(Number(v))&&Number(v)>=min&&Number(v)<=m
 const clone=x=>JSON.parse(JSON.stringify(x));
 function cleanCart(cart,products){const out={};if(!cart||typeof cart!=='object'||Array.isArray(cart))return out;for(const p of products){const n=Number(cart[p.id]);if(int(n,1,99)&&p.active&&p.stock>0)out[p.id]=Math.min(n,p.stock);}return out;}
 function distance(a,b){a=norm(a);b=norm(b);let v=Array.from({length:b.length+1},(_,i)=>i);for(let i=0;i<a.length;i++){let w=[i+1];for(let j=0;j<b.length;j++)w[j+1]=Math.min(w[j]+1,v[j+1]+1,v[j]+(a[i]===b[j]?0:1));v=w;}return v[b.length];}
-function search(products,query){const q=norm(query);if(!q)return {items:products,corrected:false};const words=q.split(' ');let direct=products.filter(p=>{let s=norm(p.name+' '+p.name_kk+' '+p.brand);return words.every(w=>s.includes(w));});if(direct.length)return {items:direct,corrected:false};return {items:products.filter(p=>{const ws=norm(p.name+' '+p.name_kk+' '+p.brand).split(' ');return words.every(w=>ws.some(x=>w.length>=4&&distance(x,w)<= (w.length>7?2:1)));}),corrected:true};}
+function search(products,query){const q=norm(String(query??'').slice(0,160));if(!q)return {items:products,corrected:false};const words=q.split(' ');let direct=products.filter(p=>{let s=norm(p.name+' '+p.name_kk+' '+p.brand);return words.every(w=>s.includes(w));});if(direct.length)return {items:direct,corrected:false};return {items:products.filter(p=>{const ws=norm(p.name+' '+p.name_kk+' '+p.brand).split(' ');return words.every(w=>ws.some(x=>w.length>=4&&distance(x,w)<= (w.length>7?2:1)));}),corrected:true};}
+// All money here is integer KZT in this demo catalogue; corrupt input fails closed.
+const MAX_MONEY=1000000000000;
+const validMoney=n=>typeof n==='number'&&Number.isSafeInteger(n)&&n>=0&&n<=MAX_MONEY;
+function businessDate(now=new Date()){
+ const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Almaty',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now),get=k=>parts.find(p=>p.type===k).value;
+ return get('year')+'-'+get('month')+'-'+get('day');
+}
 function quote(cart,products,settings,{promo='',bonus=0,balance=0,zone='almaty'}={}){
  const errors=[],lines=[];let subtotal=0,savings=0;
- if(!cart||typeof cart!=='object'||Array.isArray(cart))return {errors:['invalid_cart'],lines:[],subtotal:0,discount:0,bonus:0,delivery:0,total:0,savings:0};
- for(const [id,qty] of Object.entries(cart)){
-  const p=products.find(x=>x.id===id);
+ const failed=code=>({errors:[code],lines:[],subtotal:0,discount:0,bonus:0,delivery:0,total:0,savings:0,maxBonus:0,bonusEarned:0,freeRemaining:0,promoError:''});
+ if(!cart||typeof cart!=='object'||Array.isArray(cart)||Object.keys(cart).length>500)return failed('invalid_cart');
+ if(!Array.isArray(products)||!settings||!['deliveryFee','freeDeliveryFrom','minOrder'].every(k=>validMoney(settings[k]))||!['bonusRate','maxBonusPercent'].every(k=>typeof settings[k]==='number'&&Number.isFinite(settings[k])&&settings[k]>=0&&settings[k]<=100)||!Array.isArray(settings.promos)||!Array.isArray(settings.zones))return failed('invalid_settings');
+ if(!validMoney(balance)||!validMoney(bonus))errors.push('invalid_bonus');
+ for(const [id,value] of Object.entries(cart)){
+  const p=products.find(x=>x&&x.id===id),qty=Number(value);
   if(!p||!p.active){errors.push('unknown_product:'+id);continue;}
-  if(!int(qty,1,99)){errors.push('invalid_quantity:'+id);continue;}
+  if(!int(value,1,99)||typeof value==='boolean'){errors.push('invalid_quantity:'+id);continue;}
+  if(!validMoney(p.price)||!Number.isSafeInteger(p.stock)||p.stock<0||!(Number.isFinite(p.pack)&&p.pack>0)||!['g','ml','pc'].includes(p.unit)){errors.push('invalid_product:'+id);continue;}
   if(qty>p.stock)errors.push('stock:'+id);
-  const amount=p.price*qty;subtotal+=amount;savings+=Math.max(0,p.oldPrice-p.price)*qty;lines.push({id,qty,name:p.name,name_kk:p.name_kk,price:p.price,amount});
+  const amount=p.price*qty;if(!validMoney(amount)||!validMoney(subtotal+amount)){errors.push('amount_overflow');continue;}
+  subtotal+=amount;const old=validMoney(p.oldPrice)?p.oldPrice:p.price;const difference=Math.max(0,old-p.price)*qty;
+  if(validMoney(savings+difference))savings+=difference;
+  lines.push({id,qty,name:p.name,name_kk:p.name_kk,price:p.price,amount});
  }
  let discount=0,promoError='';
  const code=String(promo).trim().toUpperCase();
- if(code){const p=settings.promos.find(p=>p.code===code&&p.active&&(!p.endsAt||p.endsAt>=new Date().toISOString().slice(0,10)));if(!p)promoError='promo_invalid';else if(subtotal<p.minSubtotal)promoError='promo_min';else discount=Math.min(p.maxDiscount,Math.floor(subtotal*p.percent/100));}
- const maxBonus=Math.max(0,Math.min(Math.floor(balance),Math.floor((subtotal-discount)*settings.maxBonusPercent/100)));
- const usedBonus=int(bonus,0,1e9)?Math.min(Number(bonus),maxBonus):0;
- const z=(settings.zones||[]).find(z=>z.id===zone&&z.enabled);
+ if(code){const p=settings.promos.find(p=>p&&p.code===code&&p.active&&(!p.endsAt||validDate(p.endsAt)&&p.endsAt>=businessDate()));
+  if(!p)promoError='promo_invalid';
+  else if(!validMoney(p.minSubtotal)||!validMoney(p.maxDiscount)||typeof p.percent!=='number'||!Number.isFinite(p.percent)||p.percent<0||p.percent>100)errors.push('invalid_settings');
+  else if(subtotal<p.minSubtotal)promoError='promo_min';
+  else discount=Math.min(subtotal,p.maxDiscount,Math.floor(subtotal*p.percent/100));
+ }
+ const maxBonus=Math.max(0,Math.min(validMoney(balance)?balance:0,Math.floor((subtotal-discount)*settings.maxBonusPercent/100)));
+ const usedBonus=validMoney(bonus)?Math.min(bonus,maxBonus):0;
+ const z=settings.zones.find(z=>z&&z.id===zone&&z.enabled);
  if(lines.length&&!z)errors.push('zone_unavailable');
- const delivery=lines.length&&subtotal<settings.freeDeliveryFrom?(z?.fee??settings.deliveryFee):0;
- const total=Math.max(0,subtotal-discount-usedBonus)+delivery;
+ if(z&&!validMoney(z.fee))errors.push('invalid_settings');
+ const delivery=lines.length&&subtotal<settings.freeDeliveryFrom?(validMoney(z?.fee)?z.fee:settings.deliveryFee):0;
+ const total=Math.max(0,subtotal-discount-usedBonus)+delivery;if(!validMoney(total))return failed('amount_overflow');
  return {lines,errors,subtotal,discount,bonus:usedBonus,maxBonus,delivery,total,savings:savings+discount+usedBonus,promoError,bonusEarned:Math.floor(Math.max(0,subtotal-discount-usedBonus)*settings.bonusRate/100),freeRemaining:Math.max(0,settings.freeDeliveryFrom-subtotal)};
 }
 
@@ -50,9 +70,10 @@ function substitute(cart,products,fromId,toId){
 }
 
 function aggregate(recipeIds,people,recipes,products,pantry=[],overrides={}){
- const requirements={},byIngredient={};const missing=[];
+ const requirements=Object.create(null),byIngredient=Object.create(null);const missing=[];
+ if(!int(people,1,8)||!Array.isArray(recipeIds)||recipeIds.length>100)return {cart:{},details:[],missing:['invalid_plan']};
  for(const rid of recipeIds){const r=recipes.find(r=>r.id===rid);if(!r){missing.push(rid);continue;}for(const i of r.ingredients){requirements[i.key]=(requirements[i.key]||0)+i.amount*people;byIngredient[i.key]=i.unit;}}
- const atHome={};
+ const atHome=Object.create(null);
  for(const h of usablePantry(pantry)){if(h.unit!==byIngredient[h.ingredient])continue;atHome[h.ingredient]=(atHome[h.ingredient]||0)+Number(h.amount);}
  const cart={},details=[];
  for(const [key,required] of Object.entries(requirements)){
@@ -116,7 +137,7 @@ function cheaper(cart,products,settings,options={}){
 // Shared order eligibility. Recipe completion and eligibility for checkout are different facts.
 function orderReadiness(cart,products,settings,options={}){
  const q=quote(cart,products,settings,options),rows=[];
- for(const [id,value] of Object.entries(cart||{})){
+ for(const [id,value] of Object.entries(cart&&typeof cart==='object'&&!Array.isArray(cart)?cart:{})){
   const product=products.find(p=>p.id===id),qty=Number(value);
   const available=product&&product.active?Math.max(0,Math.min(99,Math.floor(Number(product.stock)||0))):0;
   const issue=!product||!product.active?'unavailable':!int(qty,1,99)?'quantity':qty>available?'stock':'';
@@ -148,5 +169,5 @@ function readDraft(raw,type,now=Date.now()){
  return null;
 }
 
-return {orderReadiness,removalPatch,restoreRemoved,DRAFT_DAYS,readDraft,localDate,validDate,pantryStatus,usablePantry,substitute,norm,int,clone,cleanCart,distance,search,quote,aggregate,parseRequest,parseExclusions,makePlan,cheaper};
+return {MAX_MONEY,validMoney,businessDate,orderReadiness,removalPatch,restoreRemoved,DRAFT_DAYS,readDraft,localDate,validDate,pantryStatus,usablePantry,substitute,norm,int,clone,cleanCart,distance,search,quote,aggregate,parseRequest,parseExclusions,makePlan,cheaper};
 });

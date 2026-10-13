@@ -24,3 +24,9 @@ body[data-theme=dark] .cart-issues{background:#392d21;border-color:#6e5135;color
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cart-dock{transition:none}}
 
 main#main:focus{outline:none}
+/* KEREK 3.4: optional guidance and quieter status, reuses both theme palettes. */
+.app-help-line{display:flex;justify-content:flex-end;margin:-4px 0 12px}.app-help-line .btn{min-height:38px;padding:6px 2px;font-size:12px;color:var(--muted);font-weight:600}.app-help-line .icon{width:17px;height:17px}
+.guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:22px 0}.guide-step{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.guide-step h2{font-size:22px;letter-spacing:-.6px}.guide-step p{font-size:14px;line-height:1.65}.guide-step .btn{margin-top:auto}.guide-number{font-size:13px;font-weight:800;letter-spacing:1px;color:#925000;background:var(--soft);padding:8px 12px;border-radius:12px}.guide-faq details{border-bottom:1px solid var(--line);padding:5px 0}.guide-faq details:last-child{border:0}.guide-faq summary{cursor:pointer;min-height:50px;padding:13px 0;font-weight:650}.guide-faq p{line-height:1.75;color:var(--muted);max-width:850px;font-size:14px}.guide-footer{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.network-note{border-left:4px solid var(--orange)}
+body[data-theme=dark] .guide-number{color:#ffd38b}.spec-row strong{overflow-wrap:anywhere;text-align:right;max-width:60%}
+@media(max-width:767px){.guide-grid{grid-template-columns:1fr}.guide-step{padding:20px}.guide-step h2{font-size:21px}.guide-footer .btn{width:100%}.app-help-line{margin-bottom:9px}.guide-faq{padding:20px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}

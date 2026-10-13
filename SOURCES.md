@@ -1,12 +1,17 @@
-# Источники и происхождение выпуска KEREK 3.3.0
+# Источники и основания выпуска KEREK 3.4
 
-1. Основа: Marklanskoy/KEREK-PLUS-, commit `0d9d9228b29a25efb93f90410c25286ed65cc92a`, KEREK3.2.0. release.json, app.js и права репозитория прочитаны через подключённый GitHub 13 октября 2026. Доступ только чтение, публикация не выполнялась.
-2. Соответствие локального предыдущего исходника проверено по Git blob SHA app.js `1478fbd4533fc0d5769a7a1324ca5d1abbd850f3`. Готовый HTML основы: SHA256 `eafae6b5fb2487b776340c57028c33e18830463d27b1a892da99d7205aa5bbf6`.
-3. Запрос пользователя основан на `KEREK_3_2_Cart_Audit_2026-10-13.md`, замечания A1–A11. Отчёт прочитан целиком. Он описывает предыдущую3.2, а не результаты исправленной версии.
-4. MDN, Working with History API: https://developer.mozilla.org/en-US/docs/Web/API/History_API/Working_with_the_History_API — внутренняя история и восстановление состояния экрана.
-5. MDN, HTMLElement.focus: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus — восстановление фокуса, preventScroll.
-6. W3C, Understanding Status Messages: https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html — ненавязчивое сообщение изменения количества/итога.
-7. Сохранённые решения3.2: MDN Web Locks API https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API и ServiceWorkerRegistration.update https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/update .
-8. Иконка — ранее сгенерированная по запросу пользователя оранжево-жёлтая K с корзиной. Размеры и подключение сохранены. Фотографии каталога — иллюстративные Unsplash-ссылки, не фотографии подтверждённых магазинных SKU.
+Проверка исходного состояния через подключённый GitHub: `Marklanskoy/KEREK-PLUS-`, ветка main, commit `161d5b6872ea8febed75f26f54ee6cacb1fcdab6`, release.json 3.3.0. Локальная исходная сборка побайтово проверена по всем полям files manifest. Исходники получены из ранее предоставленного в этом разговоре Source.zip и изменены в рабочем контейнере. Прав на push в соединении нет.
 
-В тестах только вымышленные данные. DOM-стенд специально блокирует изображения/сеть и подставляет модель localStorage/Web Locks; эмодзи в скриншотах не доказывают отсутствие изображений на сайте. Секреты, платёжные данные, личные базы пользователя в комплект не включены.
+Первичные технические источники, просмотренные при подготовке (13 октября 2026):
+
+- MDN Web Locks: https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
+- MDN Request.integrity: https://developer.mozilla.org/en-US/docs/Web/API/Request/integrity
+- MDN Using Service Workers: https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+- MDN Cache: https://developer.mozilla.org/en-US/docs/Web/API/Cache
+- Playwright Service Workers: https://playwright.dev/python/docs/service-workers
+
+Выпуск использует собственную проверку SHA-256 содержимого. Документация integrity не выдаётся за автоматическую проверку её реализации. Контрольные суммы не заменяют доверенную подпись.
+
+Результаты тестов — только реально выполненные команды из TEST_REPORT.md. Скриншоты и UI-тесты используют явные модели хранилища/блокировок, отключённые фотографии и тестовые данные. Они не являются источником утверждений о работе реального магазина или состоянии личной базы пользователя.
+
+В KEREK используются текущие демонстрационные товарные сведения и изображения-иллюстрации прежнего проекта; это не актуальный прайс магазина. Новая иконка из прошлых выпусков сохранена без перерисовки.
