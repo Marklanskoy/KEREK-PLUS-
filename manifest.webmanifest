@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "KEREK — всё, что нужно",
-  "short_name": "KEREK",
+  "name": "KEREK PLUS",
+  "short_name": "KEREK PLUS",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -10,13 +10,13 @@
   "lang": "ru",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-ref-192-350.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-ref-512-350.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

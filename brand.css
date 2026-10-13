@@ -1,0 +1,79 @@
+/* The image is not clipped, skewed, recoloured, or redrawn. */
+.brand img.brand-icon,.brand-recovery-icon,.profile-logo,.club-logo{object-fit:contain;background:transparent;filter:none;flex-shrink:0}
+.brand img.brand-icon{width:40px;height:40px;border-radius:0}
+.brand-wordmark{display:grid;text-align:left;line-height:1.02;letter-spacing:-.75px}
+.brand-wordmark small{color:var(--orange);font-size:9px;font-weight:800;letter-spacing:3.2px;line-height:1.5}
+.avatar.brand-avatar{background:transparent;border-radius:0}
+.avatar.brand-avatar img{width:64px;height:64px;object-fit:contain}
+.club-card .club-circle.brand-club{background:none;border-radius:0;width:56px;height:56px}
+.club-logo{width:56px;height:56px}
+.brand-recovery-icon{width:80px;height:80px;margin:0 0 16px}
+.brand-recovery{text-align:center}
+.about-brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.about-brand img{width:56px;height:56px;object-fit:contain}
+.about-brand strong{font-size:22px;letter-spacing:-.4px}
+/* Premium entrance: artwork remains unchanged; only its container and light effects move. */
+body.kerek-starting{overflow:hidden}
+body.kerek-starting #app,body.kerek-starting #admin{visibility:hidden}
+#kerek-splash{
+ --splash-bg:#fffaf4;--splash-text:#342114;--splash-muted:#8a6d57;
+ position:fixed;inset:0;z-index:950;display:grid;place-items:center;
+ padding:calc(24px + env(safe-area-inset-top,0px)) 22px calc(24px + env(safe-area-inset-bottom,0px));
+ overflow:hidden;background:var(--splash-bg);color:var(--splash-text);text-align:center;
+ isolation:isolate;opacity:1;visibility:visible;
+ transition:opacity .42s cubic-bezier(.22,1,.36,1),visibility .42s;
+}
+#kerek-splash::before,#kerek-splash::after{content:'';position:absolute;pointer-events:none;z-index:0;border-radius:50%}
+#kerek-splash::before{width:95vmax;height:95vmax;top:-57vmax;left:-42vmax;background:radial-gradient(circle,rgba(255,199,106,.38) 0%,rgba(255,233,192,.08) 53%,transparent 72%);animation:kerek-atmosphere 7s ease-in-out infinite alternate}
+#kerek-splash::after{width:105vmax;height:105vmax;bottom:-68vmax;right:-49vmax;background:radial-gradient(circle,rgba(250,160,58,.22) 0%,rgba(255,210,152,.07) 48%,transparent 74%);animation:kerek-atmosphere 8s ease-in-out infinite alternate-reverse}
+.splash-atmosphere{position:absolute;inset:0;pointer-events:none;z-index:0}
+.splash-atmosphere i{position:absolute;width:7px;height:7px;border-radius:50%;background:#ffa31c;opacity:.62;box-shadow:0 0 14px rgba(255,163,28,.48);animation:kerek-float 4.2s ease-in-out infinite}
+.splash-atmosphere i:nth-child(1){top:27%;left:19%;animation-delay:.1s}
+.splash-atmosphere i:nth-child(2){top:33%;right:16%;width:5px;height:5px;animation-delay:.8s}
+.splash-atmosphere i:nth-child(3){bottom:28%;left:12%;width:4px;height:4px;animation-delay:1.1s}
+.splash-atmosphere i:nth-child(4){bottom:25%;right:18%;width:7px;height:7px;animation-delay:1.6s}
+.splash-content{width:min(100%,450px);position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;isolation:isolate;transform:translateY(-12px)}
+.splash-emblem{width:250px;height:250px;max-width:68vw;max-height:68vw;margin:0 auto 23px;position:relative;display:grid;place-items:center}
+.splash-halo{position:absolute;inset:18%;border-radius:50%;background:#ffd98a;filter:blur(35px);opacity:.5;animation:kerek-breathe 3.2s ease-in-out infinite}
+.splash-orbit,.splash-orbit-secondary{position:absolute;inset:3px;border-radius:50%;pointer-events:none;z-index:0;animation:kerek-orbit 5.5s linear infinite}
+.splash-orbit{background:conic-gradient(from 0deg,transparent 0%,transparent 47%,#ffd494 72%,#ff9813 78%,transparent 84%,transparent 100%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1.7px),#000 calc(100% - 1px));mask:radial-gradient(farthest-side,transparent calc(100% - 1.7px),#000 calc(100% - 1px));opacity:.86}
+.splash-orbit-secondary{inset:17px;animation-duration:8s;animation-direction:reverse;opacity:.38;border:1px solid #f1bd77}
+.splash-logo-wrap{position:relative;display:grid;place-items:center;width:176px;height:176px;max-width:55vw;max-height:55vw;z-index:1;border-radius:36px;filter:drop-shadow(0 21px 28px rgba(214,95,5,.17));animation:kerek-logo-arrive .85s cubic-bezier(.16,1,.3,1) both}
+.splash-art{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;transform:none;filter:none}
+.splash-sheen{position:absolute;z-index:2;inset:4%;border-radius:30px;overflow:hidden;pointer-events:none}
+.splash-sheen::after{content:'';position:absolute;inset:-45%;transform:translateX(-145%) rotate(22deg);background:linear-gradient(90deg,transparent 38%,rgba(255,255,255,.06) 45%,rgba(255,255,255,.38) 51%,rgba(255,255,255,.06) 57%,transparent 64%);animation:kerek-sheen 2.5s 0.5s ease-in-out infinite}
+.splash-title{font-size:clamp(29px,7vw,40px);font-weight:880;letter-spacing:-1.6px;line-height:1.1;margin:0;color:var(--splash-text);animation:kerek-reveal .7s .18s both}
+.splash-title span{background:linear-gradient(108deg,#f45d00,#ffb400);-webkit-background-clip:text;background-clip:text;color:transparent}
+.splash-divider{height:2px;width:78px;border-radius:3px;background:linear-gradient(90deg,transparent,#ffb344,transparent);margin:19px 0 18px;animation:kerek-line .85s .32s both}
+.splash-tagline{font-size:13px;font-weight:550;letter-spacing:.14em;text-transform:uppercase;color:var(--splash-muted);margin:0 0 47px;animation:kerek-reveal .65s .3s both}
+.splash-status{margin:0;min-height:22px;font-size:13px;line-height:1.6;color:var(--splash-muted);animation:kerek-reveal .65s .52s both}
+.splash-dots{display:flex;gap:7px;justify-content:center;align-items:center;margin-top:15px;height:8px}
+.splash-dots i{width:6px;height:6px;border-radius:50%;background:#f79100;animation:kerek-dot 1.24s ease-in-out infinite;opacity:.38}
+.splash-dots i:nth-child(2){animation-delay:.16s}.splash-dots i:nth-child(3){animation-delay:.32s}
+.splash-assist{position:absolute;top:calc(100% + 37px);width:100%;font-size:11px;line-height:1.55;color:var(--splash-muted);visibility:hidden;animation:kerek-help 0s 6s forwards}
+.splash-assist a{color:inherit;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:10px 8px}
+#kerek-splash.splash-ready .splash-status{color:#b76a00}
+#kerek-splash.splash-leaving{opacity:0;visibility:hidden;pointer-events:none}
+#kerek-splash.splash-leaving .splash-content{transform:translateY(-28px) scale(1.018);transition:transform .42s cubic-bezier(.22,1,.36,1)}
+@keyframes kerek-logo-arrive{0%{opacity:0;transform:translateY(32px) scale(.68)}62%{opacity:1;transform:translateY(-4px) scale(1.04)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes kerek-reveal{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes kerek-line{from{opacity:0;transform:scaleX(.05)}to{opacity:1;transform:scaleX(1)}}
+@keyframes kerek-orbit{to{transform:rotate(360deg)}}
+@keyframes kerek-breathe{0%,100%{opacity:.32;transform:scale(.94)}50%{opacity:.55;transform:scale(1.1)}}
+@keyframes kerek-sheen{0%,30%{transform:translateX(-145%) rotate(22deg)}66%,100%{transform:translateX(145%) rotate(22deg)}}
+@keyframes kerek-dot{0%,80%,100%{opacity:.26;transform:scale(.75)}40%{opacity:1;transform:scale(1.1)}}
+@keyframes kerek-float{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-17px);opacity:.7}}
+@keyframes kerek-atmosphere{from{transform:translate(0,0)}to{transform:translate(9%,5%)}}
+@keyframes kerek-help{to{visibility:visible}}
+body[data-theme=dark] #kerek-splash{--splash-bg:#201c1a;--splash-text:#f7efe4;--splash-muted:#e1bfa0}
+body[data-theme=dark] .splash-title span{background:linear-gradient(100deg,#ff8c17,#ffd052);-webkit-background-clip:text;background-clip:text;color:transparent}
+body[data-theme=dark] .splash-orbit-secondary{border-color:#905b2e}
+@media(prefers-color-scheme:dark){body:not([data-theme]) #kerek-splash{--splash-bg:#201c1a;--splash-text:#f7efe4;--splash-muted:#e1bfa0}}
+@media(max-width:600px){.brand img.brand-icon{width:34px;height:34px}.brand-wordmark{font-size:23px}.brand-wordmark small{font-size:8px;letter-spacing:2.6px}.header-top>.brand{gap:7px}.splash-emblem{width:226px;height:226px;margin-bottom:12px}.splash-logo-wrap{width:160px;height:160px}.splash-tagline{margin-bottom:42px}}
+@media(max-width:360px){.brand img.brand-icon{width:31px;height:31px}.brand-wordmark{font-size:21px}.header-top>.brand{gap:5px}.header .mobile-address{max-width:70px}.header .mobile-address span{max-width:55px}.splash-emblem{width:208px;height:208px}.splash-logo-wrap{width:151px;height:151px}.splash-title{font-size:30px}}
+@media(max-height:550px){.splash-content{transform:none}.splash-emblem{width:154px;height:154px;margin-bottom:6px}.splash-logo-wrap{width:108px;height:108px}.splash-tagline{margin-bottom:8px}.splash-divider{margin:6px 0}.splash-assist{position:static;margin-top:5px}}
+@media(prefers-reduced-motion:reduce){
+ #kerek-splash{transition:none}.splash-orbit,.splash-orbit-secondary,.splash-halo,.splash-logo-wrap,.splash-sheen::after,.splash-title,.splash-divider,.splash-tagline,.splash-status,.splash-dots i,.splash-atmosphere i,#kerek-splash::before,#kerek-splash::after{animation:none!important;transform:none!important}
+ .splash-title,.splash-divider,.splash-tagline,.splash-status,.splash-logo-wrap{opacity:1}
+ .splash-dots i{opacity:.6}.splash-assist{animation:none;visibility:visible}
+}

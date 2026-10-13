@@ -1,7 +1,7 @@
-/* KEREK 3.4.0; complete bundle 7c8c66926d56d3eb */
-const VERSION='3.4.0',BUILD='7c8c66926d56d3eb';
+/* KEREK 3.5.0; complete bundle 6b6c31d59618c2f0 */
+const VERSION='3.5.0',BUILD='6b6c31d59618c2f0';
 const PREFIX='kerek-release:'+self.registration.scope+':',CACHE=PREFIX+BUILD;
-const ASSETS=["./index.html", "./manifest.webmanifest", "./icon-32.png", "./icon-180.png", "./icon-192.png", "./icon-512.png"],HASHES={"./index.html": "7c8c66926d56d3ebc22590f826e4e6977f10113c94303186f3e2b690e159a705", "./manifest.webmanifest": "052570a02dd45f016bb51652a80dd742d230ef4707647e4785f92ed39fcc03c4", "./icon-32.png": "9325023a929a50a37618592fcc8624b1deb2e658b0b1a7977aec2db1aeb59114", "./icon-180.png": "78213d68dbc3df94fe52da1e931dbee47901a8364065a6349377ba5dbdd14af5", "./icon-192.png": "a014d7d5593b9dab2b71854a379b637748b427a7d7267047bcb73571a288ca40", "./icon-512.png": "f511c8ab538169a36e58948d9c7c34de98a08180e09df8cefe03692302f26818"};
+const ASSETS=["./index.html", "./manifest.webmanifest", "./icon-ref-32-350.png", "./icon-ref-180-350.png", "./icon-ref-192-350.png", "./icon-ref-512-350.png"],HASHES={"./index.html": "6b6c31d59618c2f0f65d0a40b8225fbe4fbcc03f09a21d5245a56561eead2616", "./manifest.webmanifest": "9a14da06154c649f1f2f204b8bae8eb928bb9bfb37ed21ab6cec6d82ba4e8b17", "./icon-ref-32-350.png": "f68eec1446f70b6db497b66f189e8beef7068491ee6e814eec3af11fae64c3da", "./icon-ref-180-350.png": "87c3a46edbf1438720b98502b61127e1eab7f5e43f7e287600f85681fbe0b558", "./icon-ref-192-350.png": "f0a6d066b8e9d08ab90868cdd26b5614e0049bb1cbe2f338e90440c0cf7e407d", "./icon-ref-512-350.png": "458e23788e49a884b7933f11ee8cd7de708be3a8e123609b2f4e0e900a9f595d"};
 /* Cache is a versioned set, not a mix of independently fetched scripts.
    Hashes check build consistency, not a signature against a compromised host. */
 const HOME=new URL('./index.html',self.registration.scope).href;

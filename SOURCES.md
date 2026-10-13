@@ -1,17 +1,9 @@
-# Источники и основания выпуска KEREK 3.4
+# Основания выпуска 3.5.0
 
-Проверка исходного состояния через подключённый GitHub: `Marklanskoy/KEREK-PLUS-`, ветка main, commit `161d5b6872ea8febed75f26f54ee6cacb1fcdab6`, release.json 3.3.0. Локальная исходная сборка побайтово проверена по всем полям files manifest. Исходники получены из ранее предоставленного в этом разговоре Source.zip и изменены в рабочем контейнере. Прав на push в соединении нет.
+- Точный рисунок: присланный в этом разговоре IMG_2263.jpeg, SHA-256 `afe8aab5e998824bbb4ab2468468a222deb4e251c9984d998330de87e0edadde`, 105 × 114 px.
+- Код 3.4.0: ранее предоставленный Source.zip. release.json свежей ветки main прочитан через GitHub; текущий commit `fc3d2036c8e6b673144d5b5ed3e6807e6955343f`. Базовый index SHA-256 `7c8c66926d56d3ebc22590f826e4e6977f10113c94303186f3e2b690e159a705` совпал с архивом.
+- Права соединения GitHub проверены: push=false. Публикация в этой задаче не выполнялась.
+- MDN, prefers-reduced-motion (проверено 13 октября 2026): https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion
+- MDN, Using media queries for accessibility: https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using_for_accessibility
 
-Первичные технические источники, просмотренные при подготовке (13 октября 2026):
-
-- MDN Web Locks: https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
-- MDN Request.integrity: https://developer.mozilla.org/en-US/docs/Web/API/Request/integrity
-- MDN Using Service Workers: https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
-- MDN Cache: https://developer.mozilla.org/en-US/docs/Web/API/Cache
-- Playwright Service Workers: https://playwright.dev/python/docs/service-workers
-
-Выпуск использует собственную проверку SHA-256 содержимого. Документация integrity не выдаётся за автоматическую проверку её реализации. Контрольные суммы не заменяют доверенную подпись.
-
-Результаты тестов — только реально выполненные команды из TEST_REPORT.md. Скриншоты и UI-тесты используют явные модели хранилища/блокировок, отключённые фотографии и тестовые данные. Они не являются источником утверждений о работе реального магазина или состоянии личной базы пользователя.
-
-В KEREK используются текущие демонстрационные товарные сведения и изображения-иллюстрации прежнего проекта; это не актуальный прайс магазина. Новая иконка из прошлых выпусков сохранена без перерисовки.
+Изображение не генерировалось заново. CSS-анимация и пропорциональная подготовка иконок сделаны программно. Контрольные суммы проверяют согласованность, а не защищённую подпись от компрометации хостинга.
