@@ -1,5 +1,5 @@
-/* KEREK 3.2.0; complete bundle eafae6b5fb2487b7 */
-const PREFIX='kerek-release:'+self.registration.scope+':',CACHE=PREFIX+'eafae6b5fb2487b7';
+/* KEREK 3.3.0; complete bundle a84173f814d644b4 */
+const PREFIX='kerek-release:'+self.registration.scope+':',CACHE=PREFIX+'a84173f814d644b4';
 const ASSETS=["./index.html", "./manifest.webmanifest", "./icon-32.png", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 const HOME=new URL('./index.html',self.registration.scope).href;
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));

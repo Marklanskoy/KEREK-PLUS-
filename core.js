@@ -92,8 +92,8 @@ function makePlan(options,products,recipes,settings,pantry=[]){
   const candidates=allowed.map(r=>{const a=aggregate([...ids,r.id],o.people,recipes,products,pantry);const q=quote(a.cart,products,settings);return {r,a,q,score:q.total+ids.filter(id=>id===r.id).length*1500};}).filter(v=>!v.a.missing.length&&!v.q.errors.length&&v.q.total<=o.budget).sort((a,b)=>a.score-b.score||a.r.id.localeCompare(b.r.id));
   if(!candidates.length)break;ids.push(candidates[0].r.id);
  }
- const a=aggregate(ids,o.people,recipes,products,pantry);const q=quote(a.cart,products,settings);
- return {...a,quote:q,selected:ids,options:o,complete:ids.length===o.days,error:ids.length?'':'budget_too_low',partial:ids.length>0&&ids.length<o.days};
+ const a=aggregate(ids,o.people,recipes,products,pantry);const order=orderReadiness(a.cart,products,settings),q=order.quote;
+ return {...a,quote:q,order,orderable:order.canOrder,allAtHome:ids.length>0&&!a.missing.length&&order.empty,selected:ids,options:o,complete:ids.length===o.days,error:ids.length?'':'budget_too_low',partial:ids.length>0&&ids.length<o.days};
 }
 function cheaper(cart,products,settings,options={}){
  // No fallback to a product-only comparison: a delivery rule is required.
@@ -113,5 +113,40 @@ function cheaper(cart,products,settings,options={}){
  }
  return out;
 }
-return {localDate,validDate,pantryStatus,usablePantry,substitute,norm,int,clone,cleanCart,distance,search,quote,aggregate,parseRequest,parseExclusions,makePlan,cheaper};
+// Shared order eligibility. Recipe completion and eligibility for checkout are different facts.
+function orderReadiness(cart,products,settings,options={}){
+ const q=quote(cart,products,settings,options),rows=[];
+ for(const [id,value] of Object.entries(cart||{})){
+  const product=products.find(p=>p.id===id),qty=Number(value);
+  const available=product&&product.active?Math.max(0,Math.min(99,Math.floor(Number(product.stock)||0))):0;
+  const issue=!product||!product.active?'unavailable':!int(qty,1,99)?'quantity':qty>available?'stock':'';
+  rows.push({id,qty,product:product||null,available,issue});
+ }
+ const empty=rows.length===0,minimum=Number(settings.minOrder||0),shortMinimum=empty?0:Math.max(0,minimum-q.subtotal);
+ const issues=[...q.errors];if(empty)issues.push('empty_cart');if(shortMinimum)issues.push('min_order');if(q.promoError)issues.push(q.promoError);
+ return {quote:q,rows,issues:[...new Set(issues)],empty,minimum,shortMinimum,canOrder:!issues.length};
+}
+// An inverse patch returns removed lines only. Later edits (even of the same SKU) always win.
+function removalPatch(cart,ids){return {kind:'restore-lines',entries:ids.filter(id=>Object.hasOwn(cart,id)).map(id=>({id,qty:Number(cart[id]),expected:0}))};}
+function restoreRemoved(cart,patch,products){
+ const next={...cart},restored=[],skipped=[];
+ if(!patch||patch.kind!=='restore-lines'||!Array.isArray(patch.entries))return {cart:next,restored,skipped};
+ for(const x of patch.entries){
+  if(Number(next[x.id]||0)!==x.expected){skipped.push({id:x.id,reason:'changed'});continue;}
+  const p=products.find(p=>p.id===x.id);
+  if(!p||!p.active||!int(x.qty,1,99)||x.qty>Math.min(99,p.stock)){skipped.push({id:x.id,reason:'unavailable'});continue;}
+  next[x.id]=x.qty;restored.push(x.id);
+ }
+ return {cart:next,restored,skipped};
+}
+const DRAFT_DAYS=7;
+function readDraft(raw,type,now=Date.now()){
+ if(!raw||typeof raw!=='object'||!Number.isFinite(raw.updatedAt)||raw.updatedAt>now+60000||now-raw.updatedAt>DRAFT_DAYS*86400000)return null;
+ const str=(key,max)=>typeof raw[key]==='string'?raw[key].slice(0,max):'';
+ if(type==='checkout')return {address:str('address',300),comment:str('comment',500),zone:str('zone',80),slot:str('slot',100),replacements:['ask','skip','similar'].includes(raw.replacements)?raw.replacements:'ask',updatedAt:raw.updatedAt};
+ if(type==='support')return {text:str('text',3000),kind:['support','return'].includes(raw.kind)?raw.kind:'support',orderId:str('orderId',100),updatedAt:raw.updatedAt};
+ return null;
+}
+
+return {orderReadiness,removalPatch,restoreRemoved,DRAFT_DAYS,readDraft,localDate,validDate,pantryStatus,usablePantry,substitute,norm,int,clone,cleanCart,distance,search,quote,aggregate,parseRequest,parseExclusions,makePlan,cheaper};
 });

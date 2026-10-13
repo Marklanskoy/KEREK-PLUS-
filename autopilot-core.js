@@ -44,10 +44,10 @@ function propose({cart={},regular=[],pantry=[],products=[],settings,options={},m
   if(!added)notes.push({id:p.id,reason:owned>=wanted?'pantry':'in_cart'});
   items.push({id:p.id,wanted:Number(line.qty),owned,inCart,target,added});
  }
- const before=C.quote(cart,products,settings,options),quote=C.quote(next,products,settings,options),overrun=Math.max(0,quote.total-budget),shortMinimum=Math.max(0,Number(settings.minOrder||0)-quote.subtotal);
+ const before=C.quote(cart,products,settings,options),order=C.orderReadiness(next,products,settings,options),quote=order.quote,overrun=Math.max(0,quote.total-budget),shortMinimum=Math.max(0,Number(settings.minOrder||0)-quote.subtotal);
  const changed=JSON.stringify(Object.entries(next).sort())!==JSON.stringify(Object.entries(cart).sort());
- const ready=changed&&items.length>0&&Object.keys(next).length>0&&!missing.length&&!quote.errors.length&&!quote.promoError&&!overrun&&!shortMinimum;
- return {cart:next,items,notes,missing,quote,before,budget,overrun,shortMinimum,changed,ready,mode};
+ const ready=changed&&items.length>0&&Object.keys(next).length>0&&!missing.length&&order.canOrder&&!overrun;
+ return {cart:next,items,notes,missing,quote,order,before,budget,overrun,shortMinimum,changed,ready,mode};
 }
 return {defaults,validate,migrate,spend,candidates,propose};
 });

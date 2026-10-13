@@ -17,6 +17,7 @@ function acquire(){return new Promise((resolve,reject)=>{
   writable=true;announced=true;resolve(true);return new Promise(r=>release=()=>{writable=false;r();});
  }).catch(e=>{if(!announced)reject(e);writable=false;});
 });}
+async function retry(){if(writable)return true;return acquire();}
 async function open(){if(!opened){await acquire();opened=true;}return read();}
 function assertWritable(){if(!writable)throw error('storage_readonly');}
 function write(value){assertWritable();const live=storage.getItem(key);if(live!==lastRaw)throw error('storage_conflict');const prev=lastRaw?JSON.parse(lastRaw):null;
@@ -32,5 +33,5 @@ function erase(empty){assertWritable();if(storage.getItem(key)!==lastRaw)throw e
 }
 function recovery(){const out={};for(const k of [key,original,preImport,...legacyKeys]){const raw=storage.getItem(k);if(raw!==null&&k!=='kerek_csrf_v3')out[k]=raw;}return out;}
 function latest(){return lastRaw?JSON.parse(lastRaw):null;}
-return {key,original,preImport,legacyKeys,open,read,write,backup,erase,recovery,latest,assertWritable,get writable(){return writable;},get serialized(){return lastRaw;},close(){release?.();release=null;}};
+return {key,original,preImport,legacyKeys,open,retry,read,write,backup,erase,recovery,latest,assertWritable,get writable(){return writable;},get serialized(){return lastRaw;},close(){release?.();release=null;opened=false;}};
 });
